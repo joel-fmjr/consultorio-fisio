@@ -1,6 +1,7 @@
 package com.joel.consultorio_fisio.appointment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.assessment.AssessmentRepository;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,11 +31,16 @@ class AppointmentControllerTest {
     @Autowired
     private PatientRepository patientRepository;
 
+    @Autowired
+    private AssessmentRepository assessmentRepository;
+
     private AppointmentDTO appointmentDTO;
     private Patient testPatient;
 
     @BeforeEach
     void setUp() {
+        // Delete in order due to foreign key constraints
+        assessmentRepository.deleteAll();
         repository.deleteAll();
         patientRepository.deleteAll();
 
