@@ -1,6 +1,7 @@
 package com.joel.consultorio_fisio.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.assessment.AssessmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,10 +26,15 @@ class PatientControllerTest {
     @Autowired
     private PatientRepository repository;
 
+    @Autowired
+    private AssessmentRepository assessmentRepository;
+
     private PatientDTO patientDTO;
 
     @BeforeEach
     void setUp() {
+        // Delete assessments first due to foreign key constraint
+        assessmentRepository.deleteAll();
         repository.deleteAll();
 
         patientDTO = PatientDTO.builder()
