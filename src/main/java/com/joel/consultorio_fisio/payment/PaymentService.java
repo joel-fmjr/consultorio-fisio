@@ -9,6 +9,7 @@ import com.joel.consultorio_fisio.patient.PatientRepository;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.payment.PaymentCreateRequest;
 import com.mercadopago.client.payment.PaymentPayerRequest;
+import com.mercadopago.core.MPRequestOptions;
 import com.mercadopago.exceptions.MPApiException;
 import com.mercadopago.exceptions.MPException;
 import lombok.RequiredArgsConstructor;
@@ -18,9 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -75,6 +76,11 @@ public class PaymentService {
 
             // 3. Generate unique external reference
             String externalReference = "FISIO-" + UUID.randomUUID().toString();
+            Map<String, String> customHeaders = new HashMap<>();
+            customHeaders.put("x-idempotency-key", externalReference);
+            MPRequestOptions requestOptions = MPRequestOptions.builder()
+                    .customHeaders(customHeaders)
+                    .build();
 
             // 4. Calculate expiration date
             BigDecimal expirationHours = request.getExpirationHours() != null
@@ -93,7 +99,6 @@ public class PaymentService {
                             ? request.getDescription()
                             : "Consulta Fisioterapia")
                     .paymentMethodId("pix")
-                    .dateOfExpiration(OffsetDateTime.of(expirationDate, ZoneOffset.UTC))
                     .externalReference(externalReference)
                     .payer(PaymentPayerRequest.builder()
                             .email(request.getPayerEmail() != null
@@ -106,7 +111,7 @@ public class PaymentService {
             // 6. Call Mercado Pago API
             log.info("Calling Mercado Pago API to create payment");
             com.mercadopago.resources.payment.Payment mpPayment =
-                    client.create(mpRequest);
+                    client.create(mpRequest, requestOptions);
 
             log.info("Mercado Pago payment created successfully. ID: {}", mpPayment.getId());
 
