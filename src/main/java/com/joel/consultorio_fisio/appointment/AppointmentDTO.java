@@ -25,11 +25,11 @@ public class AppointmentDTO {
     @NotNull(message = "Duration is required")
     private AppointmentDuration duration;
 
-    @NotNull(message = "Payment status is required")
-    private Boolean isPaid;
+    @Builder.Default
+    private Boolean isPaid = false;
 
-    @NotNull(message = "Cancellation status is required")
-    private Boolean isCancelled;
+    @Builder.Default
+    private Boolean isCancelled = false;
 
     @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String notes;
