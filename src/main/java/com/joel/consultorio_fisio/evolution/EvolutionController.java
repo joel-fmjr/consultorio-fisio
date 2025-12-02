@@ -20,37 +20,37 @@ public class EvolutionController {
 
     @GetMapping
     @Operation(summary = "List all evolutions", description = "Returns a list of all evolution notes")
-    public ResponseEntity<List<EvolutionDTO>> findAll() {
+    public ResponseEntity<List<EvolutionResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Find evolution by ID", description = "Returns a single evolution note by its ID")
-    public ResponseEntity<EvolutionDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<EvolutionResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/patient/{patientId}")
     @Operation(summary = "Get patient evolution history",
                description = "Returns all evolution notes for a specific patient, ordered by sequence number")
-    public ResponseEntity<List<EvolutionDTO>> findByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<EvolutionResponseDTO>> findByPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(service.findByPatientId(patientId));
     }
 
     @PostMapping
     @Operation(summary = "Create evolution note",
                description = "Creates a new evolution note for a patient. Evolution number is auto-generated.")
-    public ResponseEntity<EvolutionDTO> create(@Valid @RequestBody EvolutionDTO dto) {
-        EvolutionDTO created = service.create(dto);
+    public ResponseEntity<EvolutionResponseDTO> create(@Valid @RequestBody EvolutionRequestDTO dto) {
+        EvolutionResponseDTO created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update evolution note",
                description = "Updates an existing evolution note. Patient and evolution number cannot be changed.")
-    public ResponseEntity<EvolutionDTO> update(
+    public ResponseEntity<EvolutionResponseDTO> update(
             @PathVariable Long id,
-            @Valid @RequestBody EvolutionDTO dto) {
+            @Valid @RequestBody EvolutionRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 

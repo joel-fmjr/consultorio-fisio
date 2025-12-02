@@ -8,11 +8,11 @@ import java.util.stream.Collectors;
 @Component
 public class AppointmentMapper {
 
-    public AppointmentDTO toDTO(Appointment entity) {
+    public AppointmentResponseDTO toResponseDTO(Appointment entity) {
         if (entity == null) {
             return null;
         }
-        return AppointmentDTO.builder()
+        return AppointmentResponseDTO.builder()
                 .id(entity.getId())
                 .patientId(entity.getPatient().getId())
                 .patientName(entity.getPatient().getName())
@@ -27,7 +27,7 @@ public class AppointmentMapper {
                 .build();
     }
 
-    public Appointment toEntity(AppointmentDTO dto) {
+    public Appointment toEntity(AppointmentRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -37,7 +37,6 @@ public class AppointmentMapper {
                 .build();
 
         return Appointment.builder()
-                .id(dto.getId())
                 .patient(patient)
                 .startTime(dto.getStartTime())
                 .duration(dto.getDuration())
@@ -47,9 +46,9 @@ public class AppointmentMapper {
                 .build();
     }
 
-    public List<AppointmentDTO> toDTOList(List<Appointment> entities) {
+    public List<AppointmentResponseDTO> toResponseDTOList(List<Appointment> entities) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }

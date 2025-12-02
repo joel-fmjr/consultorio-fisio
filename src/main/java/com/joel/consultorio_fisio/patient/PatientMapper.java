@@ -7,11 +7,11 @@ import java.util.stream.Collectors;
 @Component
 public class PatientMapper {
 
-    public PatientDTO toDTO(Patient entity) {
+    public PatientResponseDTO toResponseDTO(Patient entity) {
         if (entity == null) {
             return null;
         }
-        return PatientDTO.builder()
+        return PatientResponseDTO.builder()
                 .id(entity.getId())
                 .name(entity.getName())
                 .cpf(entity.getCpf())
@@ -25,12 +25,11 @@ public class PatientMapper {
                 .build();
     }
 
-    public Patient toEntity(PatientDTO dto) {
+    public Patient toEntity(PatientRequestDTO dto) {
         if (dto == null) {
             return null;
         }
         return Patient.builder()
-                .id(dto.getId())
                 .name(dto.getName())
                 .cpf(dto.getCpf())
                 .email(dto.getEmail())
@@ -41,9 +40,9 @@ public class PatientMapper {
                 .build();
     }
 
-    public List<PatientDTO> toDTOList(List<Patient> entities) {
+    public List<PatientResponseDTO> toResponseDTOList(List<Patient> entities) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }

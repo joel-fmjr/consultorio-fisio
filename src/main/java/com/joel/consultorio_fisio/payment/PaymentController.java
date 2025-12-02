@@ -27,25 +27,25 @@ public class PaymentController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Find payment by ID", description = "Returns a single payment by its internal ID")
-    public ResponseEntity<PaymentDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/mercadopago/{mercadoPagoId}")
     @Operation(summary = "Find payment by Mercado Pago ID", description = "Returns a single payment by its Mercado Pago payment ID")
-    public ResponseEntity<PaymentDTO> findByMercadoPagoId(@PathVariable Long mercadoPagoId) {
+    public ResponseEntity<PaymentResponseDTO> findByMercadoPagoId(@PathVariable Long mercadoPagoId) {
         return ResponseEntity.ok(service.findByMercadoPagoId(mercadoPagoId));
     }
 
     @GetMapping("/patient/{patientId}")
     @Operation(summary = "Find payments by patient", description = "Returns all payments for a specific patient")
-    public ResponseEntity<List<PaymentDTO>> findByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<PaymentResponseDTO>> findByPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(service.findByPatientId(patientId));
     }
 
     @GetMapping
     @Operation(summary = "List all payments", description = "Returns a list of all payments, optionally filtered by status")
-    public ResponseEntity<List<PaymentDTO>> findAll(@RequestParam(required = false) PaymentStatus status) {
+    public ResponseEntity<List<PaymentResponseDTO>> findAll(@RequestParam(required = false) PaymentStatus status) {
         if (status != null) {
             return ResponseEntity.ok(service.findByStatus(status));
         }

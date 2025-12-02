@@ -13,22 +13,22 @@ public class PatientService {
     private final PatientRepository repository;
     private final PatientMapper mapper;
 
-    public List<PatientDTO> findAll() {
-        return mapper.toDTOList(repository.findAll());
+    public List<PatientResponseDTO> findAll() {
+        return mapper.toResponseDTOList(repository.findAll());
     }
 
-    public PatientDTO findById(Long id) {
+    public PatientResponseDTO findById(Long id) {
         Patient patient = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
-        return mapper.toDTO(patient);
+        return mapper.toResponseDTO(patient);
     }
 
-    public List<PatientDTO> findByName(String name) {
-        return mapper.toDTOList(repository.findByNameContainingIgnoreCase(name));
+    public List<PatientResponseDTO> findByName(String name) {
+        return mapper.toResponseDTOList(repository.findByNameContainingIgnoreCase(name));
     }
 
     @Transactional
-    public PatientDTO create(PatientDTO dto) {
+    public PatientResponseDTO create(PatientRequestDTO dto) {
         // Validate unique CPF only if provided
         if (dto.getCpf() != null && !dto.getCpf().isBlank() &&
             repository.findByCpf(dto.getCpf()).isPresent()) {
@@ -43,11 +43,11 @@ public class PatientService {
 
         Patient patient = mapper.toEntity(dto);
         Patient saved = repository.save(patient);
-        return mapper.toDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public PatientDTO update(Long id, PatientDTO dto) {
+    public PatientResponseDTO update(Long id, PatientRequestDTO dto) {
         Patient existingPatient = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + id));
 
@@ -75,7 +75,7 @@ public class PatientService {
         existingPatient.setMedicalHistory(dto.getMedicalHistory());
 
         Patient updated = repository.save(existingPatient);
-        return mapper.toDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Transactional

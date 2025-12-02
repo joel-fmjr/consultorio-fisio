@@ -16,22 +16,22 @@ public class AppointmentService {
     private final AppointmentMapper mapper;
     private final PatientRepository patientRepository;
 
-    public List<AppointmentDTO> findAll() {
-        return mapper.toDTOList(repository.findAll());
+    public List<AppointmentResponseDTO> findAll() {
+        return mapper.toResponseDTOList(repository.findAll());
     }
 
-    public AppointmentDTO findById(Long id) {
+    public AppointmentResponseDTO findById(Long id) {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
-        return mapper.toDTO(appointment);
+        return mapper.toResponseDTO(appointment);
     }
 
-    public List<AppointmentDTO> findByPatientId(Long patientId) {
-        return mapper.toDTOList(repository.findByPatientId(patientId));
+    public List<AppointmentResponseDTO> findByPatientId(Long patientId) {
+        return mapper.toResponseDTOList(repository.findByPatientId(patientId));
     }
 
     @Transactional
-    public AppointmentDTO create(AppointmentDTO dto) {
+    public AppointmentResponseDTO create(AppointmentRequestDTO dto) {
         // Validate patient exists
         Patient patient = patientRepository.findById(dto.getPatientId())
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + dto.getPatientId()));
@@ -40,11 +40,11 @@ public class AppointmentService {
         appointment.setPatient(patient);
 
         Appointment saved = repository.save(appointment);
-        return mapper.toDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public AppointmentDTO update(Long id, AppointmentDTO dto) {
+    public AppointmentResponseDTO update(Long id, AppointmentRequestDTO dto) {
         Appointment existingAppointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
 
@@ -63,7 +63,7 @@ public class AppointmentService {
         existingAppointment.setNotes(dto.getNotes());
 
         Appointment updated = repository.save(existingAppointment);
-        return mapper.toDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Transactional
@@ -75,22 +75,22 @@ public class AppointmentService {
     }
 
     @Transactional
-    public AppointmentDTO markAsPaid(Long id) {
+    public AppointmentResponseDTO markAsPaid(Long id) {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
 
         appointment.setIsPaid(true);
         Appointment updated = repository.save(appointment);
-        return mapper.toDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Transactional
-    public AppointmentDTO cancelAppointment(Long id) {
+    public AppointmentResponseDTO cancelAppointment(Long id) {
         Appointment appointment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
 
         appointment.setIsCancelled(true);
         Appointment updated = repository.save(appointment);
-        return mapper.toDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 }

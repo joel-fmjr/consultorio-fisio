@@ -9,11 +9,11 @@ import java.util.stream.Collectors;
 @Component
 public class EvolutionMapper {
 
-    public EvolutionDTO toDTO(Evolution entity) {
+    public EvolutionResponseDTO toResponseDTO(Evolution entity) {
         if (entity == null) {
             return null;
         }
-        return EvolutionDTO.builder()
+        return EvolutionResponseDTO.builder()
                 .id(entity.getId())
                 .patientId(entity.getPatient().getId())
                 .patientName(entity.getPatient().getName())
@@ -25,7 +25,7 @@ public class EvolutionMapper {
                 .build();
     }
 
-    public Evolution toEntity(EvolutionDTO dto) {
+    public Evolution toEntity(EvolutionRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -35,16 +35,14 @@ public class EvolutionMapper {
                 .build();
 
         return Evolution.builder()
-                .id(dto.getId())
                 .patient(patient)
-                .evolutionDate(dto.getEvolutionDate())
                 .conduct(dto.getConduct())
                 .build();
     }
 
-    public List<EvolutionDTO> toDTOList(List<Evolution> entities) {
+    public List<EvolutionResponseDTO> toResponseDTOList(List<Evolution> entities) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }

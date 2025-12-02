@@ -34,28 +34,28 @@ public class PaymentService {
     private final AppointmentRepository appointmentRepository;
     private final PaymentMapper paymentMapper;
 
-    public List<PaymentDTO> findAll() {
-        return paymentMapper.toDTOList(paymentRepository.findAll());
+    public List<PaymentResponseDTO> findAll() {
+        return paymentMapper.toResponseDTOList(paymentRepository.findAll());
     }
 
-    public PaymentDTO findById(Long id) {
+    public PaymentResponseDTO findById(Long id) {
         Payment payment = paymentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with id: " + id));
-        return paymentMapper.toDTO(payment);
+        return paymentMapper.toResponseDTO(payment);
     }
 
-    public PaymentDTO findByMercadoPagoId(Long mercadoPagoId) {
+    public PaymentResponseDTO findByMercadoPagoId(Long mercadoPagoId) {
         Payment payment = paymentRepository.findByMercadoPagoPaymentId(mercadoPagoId)
                 .orElseThrow(() -> new ResourceNotFoundException("Payment not found with Mercado Pago ID: " + mercadoPagoId));
-        return paymentMapper.toDTO(payment);
+        return paymentMapper.toResponseDTO(payment);
     }
 
-    public List<PaymentDTO> findByPatientId(Long patientId) {
-        return paymentMapper.toDTOList(paymentRepository.findByPatientId(patientId));
+    public List<PaymentResponseDTO> findByPatientId(Long patientId) {
+        return paymentMapper.toResponseDTOList(paymentRepository.findByPatientId(patientId));
     }
 
-    public List<PaymentDTO> findByStatus(PaymentStatus status) {
-        return paymentMapper.toDTOList(paymentRepository.findByStatus(status));
+    public List<PaymentResponseDTO> findByStatus(PaymentStatus status) {
+        return paymentMapper.toResponseDTOList(paymentRepository.findByStatus(status));
     }
 
     @Transactional
@@ -160,7 +160,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public PaymentDTO updatePaymentStatus(Long mercadoPagoId, PaymentStatus status, String statusDetail) {
+    public PaymentResponseDTO updatePaymentStatus(Long mercadoPagoId, PaymentStatus status, String statusDetail) {
         log.info("Updating payment status for Mercado Pago ID: {} to {}", mercadoPagoId, status);
 
         Payment payment = paymentRepository.findByMercadoPagoPaymentId(mercadoPagoId)
@@ -172,7 +172,7 @@ public class PaymentService {
         Payment updatedPayment = paymentRepository.save(payment);
         log.info("Payment status updated successfully");
 
-        return paymentMapper.toDTO(updatedPayment);
+        return paymentMapper.toResponseDTO(updatedPayment);
     }
 
     @Transactional
