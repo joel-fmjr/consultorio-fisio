@@ -34,7 +34,7 @@ class AppointmentControllerTest {
     @Autowired
     private AssessmentRepository assessmentRepository;
 
-    private AppointmentDTO appointmentDTO;
+    private AppointmentRequestDTO appointmentRequestDTO;
     private Patient testPatient;
 
     @BeforeEach
@@ -52,7 +52,7 @@ class AppointmentControllerTest {
 
         LocalDateTime futureTime = LocalDateTime.now().plusDays(1);
 
-        appointmentDTO = AppointmentDTO.builder()
+        appointmentRequestDTO = AppointmentRequestDTO.builder()
                 .patientId(testPatient.getId())
                 .startTime(futureTime)
                 .duration(AppointmentDuration.ONE_HOUR)
@@ -66,7 +66,7 @@ class AppointmentControllerTest {
     void shouldCreateAppointment() throws Exception {
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.patientId").value(testPatient.getId()))
                 .andExpect(jsonPath("$.duration").value("ONE_HOUR"))
@@ -75,21 +75,21 @@ class AppointmentControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenInvalidData() throws Exception {
-        appointmentDTO.setStartTime(LocalDateTime.now().minusDays(1)); // Past date
+        appointmentRequestDTO.setStartTime(LocalDateTime.now().minusDays(1)); // Past date
 
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturnBadRequestWhenPatientNotFound() throws Exception {
-        appointmentDTO.setPatientId(999L);
+        appointmentRequestDTO.setPatientId(999L);
 
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
     }
@@ -105,11 +105,11 @@ class AppointmentControllerTest {
     void shouldGetAppointmentById() throws Exception {
         String response = mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AppointmentDTO created = objectMapper.readValue(response, AppointmentDTO.class);
+        AppointmentResponseDTO created = objectMapper.readValue(response, AppointmentResponseDTO.class);
 
         mockMvc.perform(get("/api/appointments/" + created.getId()))
                 .andExpect(status().isOk())
@@ -126,17 +126,23 @@ class AppointmentControllerTest {
     void shouldUpdateAppointment() throws Exception {
         String response = mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AppointmentDTO created = objectMapper.readValue(response, AppointmentDTO.class);
-        created.setNotes("Updated notes");
-        created.setDuration(AppointmentDuration.TWO_HOURS);
+        AppointmentResponseDTO created = objectMapper.readValue(response, AppointmentResponseDTO.class);
+        AppointmentRequestDTO updateDTO = AppointmentRequestDTO.builder()
+                .patientId(created.getPatientId())
+                .startTime(created.getStartTime())
+                .duration(AppointmentDuration.TWO_HOURS)
+                .isPaid(created.getIsPaid())
+                .isCancelled(created.getIsCancelled())
+                .notes("Updated notes")
+                .build();
 
         mockMvc.perform(put("/api/appointments/" + created.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(created)))
+                .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.notes").value("Updated notes"))
                 .andExpect(jsonPath("$.duration").value("TWO_HOURS"));
@@ -146,11 +152,11 @@ class AppointmentControllerTest {
     void shouldDeleteAppointment() throws Exception {
         String response = mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AppointmentDTO created = objectMapper.readValue(response, AppointmentDTO.class);
+        AppointmentResponseDTO created = objectMapper.readValue(response, AppointmentResponseDTO.class);
 
         mockMvc.perform(delete("/api/appointments/" + created.getId()))
                 .andExpect(status().isNoContent());
@@ -160,11 +166,11 @@ class AppointmentControllerTest {
     void shouldMarkAppointmentAsPaid() throws Exception {
         String response = mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AppointmentDTO created = objectMapper.readValue(response, AppointmentDTO.class);
+        AppointmentResponseDTO created = objectMapper.readValue(response, AppointmentResponseDTO.class);
 
         mockMvc.perform(patch("/api/appointments/" + created.getId() + "/pay"))
                 .andExpect(status().isOk())
@@ -175,11 +181,11 @@ class AppointmentControllerTest {
     void shouldCancelAppointment() throws Exception {
         String response = mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AppointmentDTO created = objectMapper.readValue(response, AppointmentDTO.class);
+        AppointmentResponseDTO created = objectMapper.readValue(response, AppointmentResponseDTO.class);
 
         mockMvc.perform(patch("/api/appointments/" + created.getId() + "/cancel"))
                 .andExpect(status().isOk())
@@ -190,7 +196,7 @@ class AppointmentControllerTest {
     void shouldGetAppointmentsByPatientId() throws Exception {
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/appointments/patient/" + testPatient.getId()))
@@ -200,22 +206,22 @@ class AppointmentControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenStartTimeIsMissing() throws Exception {
-        appointmentDTO.setStartTime(null);
+        appointmentRequestDTO.setStartTime(null);
 
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.startTime").exists());
     }
 
     @Test
     void shouldReturnBadRequestWhenDurationIsMissing() throws Exception {
-        appointmentDTO.setDuration(null);
+        appointmentRequestDTO.setDuration(null);
 
         mockMvc.perform(post("/api/appointments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(appointmentDTO)))
+                .content(objectMapper.writeValueAsString(appointmentRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.duration").exists());
     }

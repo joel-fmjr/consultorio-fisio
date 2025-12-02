@@ -32,7 +32,7 @@ class AssessmentControllerTest {
     @Autowired
     private PatientRepository patientRepository;
 
-    private AssessmentDTO assessmentDTO;
+    private AssessmentRequestDTO assessmentRequestDTO;
     private Patient testPatient;
 
     @BeforeEach
@@ -47,7 +47,7 @@ class AssessmentControllerTest {
                 .build();
         testPatient = patientRepository.save(testPatient);
 
-        assessmentDTO = AssessmentDTO.builder()
+        assessmentRequestDTO = AssessmentRequestDTO.builder()
                 .patientId(testPatient.getId())
                 .assessmentDate(LocalDate.now())
                 .mainComplaint("Dor lombar crônica")
@@ -62,7 +62,7 @@ class AssessmentControllerTest {
     void shouldCreateAssessment() throws Exception {
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.patientId").value(testPatient.getId()))
                 .andExpect(jsonPath("$.mainComplaint").value("Dor lombar crônica"))
@@ -72,21 +72,21 @@ class AssessmentControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenCreatingWithInvalidData() throws Exception {
-        assessmentDTO.setPatientId(null); // Missing required field
+        assessmentRequestDTO.setPatientId(null); // Missing required field
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturnBadRequestWhenPatientNotFound() throws Exception {
-        assessmentDTO.setPatientId(999L);
+        assessmentRequestDTO.setPatientId(999L);
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.message").value("Patient not found with id: 999"));
     }
@@ -95,11 +95,11 @@ class AssessmentControllerTest {
     void shouldFindAssessmentById() throws Exception {
         String response = mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AssessmentDTO created = objectMapper.readValue(response, AssessmentDTO.class);
+        AssessmentResponseDTO created = objectMapper.readValue(response, AssessmentResponseDTO.class);
 
         mockMvc.perform(get("/api/assessments/" + created.getId()))
                 .andExpect(status().isOk())
@@ -117,7 +117,7 @@ class AssessmentControllerTest {
     void shouldFindAllAssessments() throws Exception {
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/assessments"))
@@ -130,7 +130,7 @@ class AssessmentControllerTest {
     void shouldFindAssessmentsByPatientId() throws Exception {
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/assessments/patient/" + testPatient.getId()))
@@ -143,17 +143,24 @@ class AssessmentControllerTest {
     void shouldUpdateAssessment() throws Exception {
         String response = mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AssessmentDTO created = objectMapper.readValue(response, AssessmentDTO.class);
-        created.setMainComplaint("Dor lombar crônica - melhorou após tratamento");
-        created.setPainScale(4);
+        AssessmentResponseDTO created = objectMapper.readValue(response, AssessmentResponseDTO.class);
+        AssessmentRequestDTO updateDTO = AssessmentRequestDTO.builder()
+                .patientId(created.getPatientId())
+                .assessmentDate(created.getAssessmentDate())
+                .mainComplaint("Dor lombar crônica - melhorou após tratamento")
+                .painScale(4)
+                .hasDiabetes(created.getHasDiabetes())
+                .hasHypertension(created.getHasHypertension())
+                .eatingHabits(created.getEatingHabits())
+                .build();
 
         mockMvc.perform(put("/api/assessments/" + created.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(created)))
+                .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.mainComplaint").value("Dor lombar crônica - melhorou após tratamento"))
                 .andExpect(jsonPath("$.painScale").value(4));
@@ -163,11 +170,11 @@ class AssessmentControllerTest {
     void shouldDeleteAssessment() throws Exception {
         String response = mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        AssessmentDTO created = objectMapper.readValue(response, AssessmentDTO.class);
+        AssessmentResponseDTO created = objectMapper.readValue(response, AssessmentResponseDTO.class);
 
         mockMvc.perform(delete("/api/assessments/" + created.getId()))
                 .andExpect(status().isNoContent());
@@ -178,35 +185,35 @@ class AssessmentControllerTest {
 
     @Test
     void shouldValidatePainScaleRange() throws Exception {
-        assessmentDTO.setPainScale(15); // Invalid: greater than 10
+        assessmentRequestDTO.setPainScale(15); // Invalid: greater than 10
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isBadRequest());
 
-        assessmentDTO.setPainScale(-1); // Invalid: less than 0
+        assessmentRequestDTO.setPainScale(-1); // Invalid: less than 0
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isBadRequest());
 
-        assessmentDTO.setPainScale(5); // Valid
+        assessmentRequestDTO.setPainScale(5); // Valid
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isCreated());
     }
 
     @Test
     void shouldValidateAssessmentDateNotInFuture() throws Exception {
-        assessmentDTO.setAssessmentDate(LocalDate.now().plusDays(1)); // Future date
+        assessmentRequestDTO.setAssessmentDate(LocalDate.now().plusDays(1)); // Future date
 
         mockMvc.perform(post("/api/assessments")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(assessmentDTO)))
+                .content(objectMapper.writeValueAsString(assessmentRequestDTO)))
                 .andExpect(status().isBadRequest());
     }
 }

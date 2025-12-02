@@ -26,12 +26,23 @@ class PatientServiceTest {
     @InjectMocks
     private PatientService service;
 
-    private PatientDTO patientDTO;
+    private PatientRequestDTO patientRequestDTO;
+    private PatientResponseDTO patientResponseDTO;
     private Patient patient;
 
     @BeforeEach
     void setUp() {
-        patientDTO = PatientDTO.builder()
+        patientRequestDTO = PatientRequestDTO.builder()
+                .name("João Silva")
+                .cpf("12345678901")
+                .email("joao@example.com")
+                .phone("11987654321")
+                .birthDate(LocalDate.of(1990, 5, 15))
+                .address("Rua A, 123")
+                .build();
+
+        patientResponseDTO = PatientResponseDTO.builder()
+                .id(1L)
                 .name("João Silva")
                 .cpf("12345678901")
                 .email("joao@example.com")
@@ -55,11 +66,11 @@ class PatientServiceTest {
     void shouldCreatePatientSuccessfully() {
         when(repository.findByCpf(anyString())).thenReturn(Optional.empty());
         when(repository.findByEmail(anyString())).thenReturn(Optional.empty());
-        when(mapper.toEntity(any(PatientDTO.class))).thenReturn(patient);
+        when(mapper.toEntity(any(PatientRequestDTO.class))).thenReturn(patient);
         when(repository.save(any(Patient.class))).thenReturn(patient);
-        when(mapper.toDTO(any(Patient.class))).thenReturn(patientDTO);
+        when(mapper.toResponseDTO(any(Patient.class))).thenReturn(patientResponseDTO);
 
-        PatientDTO result = service.create(patientDTO);
+        PatientResponseDTO result = service.create(patientRequestDTO);
 
         assertNotNull(result);
         assertEquals("João Silva", result.getName());
@@ -70,7 +81,7 @@ class PatientServiceTest {
     void shouldThrowExceptionWhenCpfAlreadyExists() {
         when(repository.findByCpf(anyString())).thenReturn(Optional.of(patient));
 
-        assertThrows(IllegalArgumentException.class, () -> service.create(patientDTO));
+        assertThrows(IllegalArgumentException.class, () -> service.create(patientRequestDTO));
         verify(repository, never()).save(any(Patient.class));
     }
 
@@ -79,16 +90,16 @@ class PatientServiceTest {
         when(repository.findByCpf(anyString())).thenReturn(Optional.empty());
         when(repository.findByEmail(anyString())).thenReturn(Optional.of(patient));
 
-        assertThrows(IllegalArgumentException.class, () -> service.create(patientDTO));
+        assertThrows(IllegalArgumentException.class, () -> service.create(patientRequestDTO));
         verify(repository, never()).save(any(Patient.class));
     }
 
     @Test
     void shouldFindPatientById() {
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
-        when(mapper.toDTO(any(Patient.class))).thenReturn(patientDTO);
+        when(mapper.toResponseDTO(any(Patient.class))).thenReturn(patientResponseDTO);
 
-        PatientDTO result = service.findById(1L);
+        PatientResponseDTO result = service.findById(1L);
 
         assertNotNull(result);
         assertEquals("João Silva", result.getName());
@@ -103,7 +114,13 @@ class PatientServiceTest {
 
     @Test
     void shouldCreatePatientWithMinimalData() {
-        PatientDTO minimalDTO = PatientDTO.builder()
+        PatientRequestDTO minimalRequestDTO = PatientRequestDTO.builder()
+                .name("Quick Patient")
+                .phone("11999999999")
+                .build();
+
+        PatientResponseDTO minimalResponseDTO = PatientResponseDTO.builder()
+                .id(2L)
                 .name("Quick Patient")
                 .phone("11999999999")
                 .build();
@@ -114,11 +131,11 @@ class PatientServiceTest {
                 .phone("11999999999")
                 .build();
 
-        when(mapper.toEntity(any(PatientDTO.class))).thenReturn(minimalPatient);
+        when(mapper.toEntity(any(PatientRequestDTO.class))).thenReturn(minimalPatient);
         when(repository.save(any(Patient.class))).thenReturn(minimalPatient);
-        when(mapper.toDTO(any(Patient.class))).thenReturn(minimalDTO);
+        when(mapper.toResponseDTO(any(Patient.class))).thenReturn(minimalResponseDTO);
 
-        PatientDTO result = service.create(minimalDTO);
+        PatientResponseDTO result = service.create(minimalRequestDTO);
 
         assertNotNull(result);
         assertEquals("Quick Patient", result.getName());
@@ -130,9 +147,9 @@ class PatientServiceTest {
     void shouldUpdatePatientSuccessfully() {
         when(repository.findById(1L)).thenReturn(Optional.of(patient));
         when(repository.save(any(Patient.class))).thenReturn(patient);
-        when(mapper.toDTO(any(Patient.class))).thenReturn(patientDTO);
+        when(mapper.toResponseDTO(any(Patient.class))).thenReturn(patientResponseDTO);
 
-        PatientDTO result = service.update(1L, patientDTO);
+        PatientResponseDTO result = service.update(1L, patientRequestDTO);
 
         assertNotNull(result);
         verify(repository).save(any(Patient.class));
@@ -158,9 +175,9 @@ class PatientServiceTest {
     @Test
     void shouldFindAllPatients() {
         when(repository.findAll()).thenReturn(List.of(patient));
-        when(mapper.toDTOList(anyList())).thenReturn(List.of(patientDTO));
+        when(mapper.toResponseDTOList(anyList())).thenReturn(List.of(patientResponseDTO));
 
-        List<PatientDTO> result = service.findAll();
+        List<PatientResponseDTO> result = service.findAll();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -170,9 +187,9 @@ class PatientServiceTest {
     @Test
     void shouldSearchPatientsByName() {
         when(repository.findByNameContainingIgnoreCase(anyString())).thenReturn(List.of(patient));
-        when(mapper.toDTOList(anyList())).thenReturn(List.of(patientDTO));
+        when(mapper.toResponseDTOList(anyList())).thenReturn(List.of(patientResponseDTO));
 
-        List<PatientDTO> result = service.findByName("João");
+        List<PatientResponseDTO> result = service.findByName("João");
 
         assertNotNull(result);
         assertFalse(result.isEmpty());

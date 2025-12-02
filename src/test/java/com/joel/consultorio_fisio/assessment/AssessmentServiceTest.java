@@ -34,7 +34,8 @@ class AssessmentServiceTest {
     @InjectMocks
     private AssessmentService service;
 
-    private AssessmentDTO assessmentDTO;
+    private AssessmentRequestDTO assessmentRequestDTO;
+    private AssessmentResponseDTO assessmentResponseDTO;
     private Assessment assessment;
     private Patient patient;
 
@@ -45,8 +46,20 @@ class AssessmentServiceTest {
                 .name("Maria Silva")
                 .build();
 
-        assessmentDTO = AssessmentDTO.builder()
+        assessmentRequestDTO = AssessmentRequestDTO.builder()
                 .patientId(1L)
+                .assessmentDate(LocalDate.now())
+                .mainComplaint("Dor lombar crônica")
+                .painScale(7)
+                .hasDiabetes(false)
+                .hasHypertension(false)
+                .eatingHabits(EatingHabits.HEALTHY)
+                .build();
+
+        assessmentResponseDTO = AssessmentResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .patientName("Maria Silva")
                 .assessmentDate(LocalDate.now())
                 .mainComplaint("Dor lombar crônica")
                 .painScale(7)
@@ -70,11 +83,11 @@ class AssessmentServiceTest {
     @Test
     void shouldCreateAssessmentSuccessfully() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(mapper.toEntity(any(AssessmentDTO.class))).thenReturn(assessment);
+        when(mapper.toEntity(any(AssessmentRequestDTO.class))).thenReturn(assessment);
         when(repository.save(any(Assessment.class))).thenReturn(assessment);
-        when(mapper.toDTO(any(Assessment.class))).thenReturn(assessmentDTO);
+        when(mapper.toResponseDTO(any(Assessment.class))).thenReturn(assessmentResponseDTO);
 
-        AssessmentDTO result = service.create(assessmentDTO);
+        AssessmentResponseDTO result = service.create(assessmentRequestDTO);
 
         assertNotNull(result);
         assertEquals(1L, result.getPatientId());
@@ -86,16 +99,16 @@ class AssessmentServiceTest {
     void shouldThrowExceptionWhenPatientNotFound() {
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.create(assessmentDTO));
+        assertThrows(IllegalArgumentException.class, () -> service.create(assessmentRequestDTO));
         verify(repository, never()).save(any(Assessment.class));
     }
 
     @Test
     void shouldFindAssessmentById() {
         when(repository.findById(1L)).thenReturn(Optional.of(assessment));
-        when(mapper.toDTO(any(Assessment.class))).thenReturn(assessmentDTO);
+        when(mapper.toResponseDTO(any(Assessment.class))).thenReturn(assessmentResponseDTO);
 
-        AssessmentDTO result = service.findById(1L);
+        AssessmentResponseDTO result = service.findById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getPatientId());
@@ -112,12 +125,12 @@ class AssessmentServiceTest {
     @Test
     void shouldFindAllAssessments() {
         List<Assessment> assessments = Arrays.asList(assessment);
-        List<AssessmentDTO> assessmentDTOs = Arrays.asList(assessmentDTO);
+        List<AssessmentResponseDTO> assessmentDTOs = Arrays.asList(assessmentResponseDTO);
 
         when(repository.findAll()).thenReturn(assessments);
-        when(mapper.toDTOList(assessments)).thenReturn(assessmentDTOs);
+        when(mapper.toResponseDTOList(assessments)).thenReturn(assessmentDTOs);
 
-        List<AssessmentDTO> result = service.findAll();
+        List<AssessmentResponseDTO> result = service.findAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -127,12 +140,12 @@ class AssessmentServiceTest {
     @Test
     void shouldFindAssessmentsByPatientId() {
         List<Assessment> assessments = Arrays.asList(assessment);
-        List<AssessmentDTO> assessmentDTOs = Arrays.asList(assessmentDTO);
+        List<AssessmentResponseDTO> assessmentDTOs = Arrays.asList(assessmentResponseDTO);
 
         when(repository.findByPatientIdOrderByAssessmentDateDesc(1L)).thenReturn(assessments);
-        when(mapper.toDTOList(assessments)).thenReturn(assessmentDTOs);
+        when(mapper.toResponseDTOList(assessments)).thenReturn(assessmentDTOs);
 
-        List<AssessmentDTO> result = service.findByPatientId(1L);
+        List<AssessmentResponseDTO> result = service.findByPatientId(1L);
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -143,9 +156,9 @@ class AssessmentServiceTest {
     void shouldUpdateAssessmentSuccessfully() {
         when(repository.findById(1L)).thenReturn(Optional.of(assessment));
         when(repository.save(any(Assessment.class))).thenReturn(assessment);
-        when(mapper.toDTO(any(Assessment.class))).thenReturn(assessmentDTO);
+        when(mapper.toResponseDTO(any(Assessment.class))).thenReturn(assessmentResponseDTO);
 
-        AssessmentDTO result = service.update(1L, assessmentDTO);
+        AssessmentResponseDTO result = service.update(1L, assessmentRequestDTO);
 
         assertNotNull(result);
         verify(repository).save(any(Assessment.class));

@@ -35,7 +35,8 @@ class EvolutionServiceTest {
     private EvolutionService service;
 
     private Patient patient;
-    private EvolutionDTO evolutionDTO;
+    private EvolutionRequestDTO evolutionRequestDTO;
+    private EvolutionResponseDTO evolutionResponseDTO;
     private Evolution evolution;
 
     @BeforeEach
@@ -45,9 +46,17 @@ class EvolutionServiceTest {
                 .name("João Silva")
                 .build();
 
-        evolutionDTO = EvolutionDTO.builder()
+        evolutionRequestDTO = EvolutionRequestDTO.builder()
                 .patientId(1L)
+                .conduct("Mobilização articular do ombro direito, 30 minutos")
+                .build();
+
+        evolutionResponseDTO = EvolutionResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .patientName("João Silva")
                 .evolutionDate(LocalDateTime.of(2025, 12, 1, 10, 0))
+                .evolutionNumber(1)
                 .conduct("Mobilização articular do ombro direito, 30 minutos")
                 .build();
 
@@ -63,12 +72,12 @@ class EvolutionServiceTest {
     @Test
     void shouldCreateEvolutionSuccessfully() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(evolutionMapper.toEntity(any(EvolutionDTO.class))).thenReturn(evolution);
+        when(evolutionMapper.toEntity(any(EvolutionRequestDTO.class))).thenReturn(evolution);
         when(evolutionRepository.countByPatientId(1L)).thenReturn(0L);
         when(evolutionRepository.save(any(Evolution.class))).thenReturn(evolution);
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(evolutionDTO);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(evolutionResponseDTO);
 
-        EvolutionDTO result = service.create(evolutionDTO);
+        EvolutionResponseDTO result = service.create(evolutionRequestDTO);
 
         assertNotNull(result);
         verify(evolutionRepository).countByPatientId(1L);
@@ -78,16 +87,16 @@ class EvolutionServiceTest {
     @Test
     void shouldCreateFirstEvolutionWithNumberOne() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(evolutionMapper.toEntity(any(EvolutionDTO.class))).thenReturn(evolution);
+        when(evolutionMapper.toEntity(any(EvolutionRequestDTO.class))).thenReturn(evolution);
         when(evolutionRepository.countByPatientId(1L)).thenReturn(0L);
         when(evolutionRepository.save(any(Evolution.class))).thenAnswer(invocation -> {
             Evolution saved = invocation.getArgument(0);
             assertEquals(1, saved.getEvolutionNumber());
             return saved;
         });
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(evolutionDTO);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(evolutionResponseDTO);
 
-        service.create(evolutionDTO);
+        service.create(evolutionRequestDTO);
 
         verify(evolutionRepository).countByPatientId(1L);
     }
@@ -95,16 +104,16 @@ class EvolutionServiceTest {
     @Test
     void shouldCreateSecondEvolutionWithNumberTwo() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(evolutionMapper.toEntity(any(EvolutionDTO.class))).thenReturn(evolution);
+        when(evolutionMapper.toEntity(any(EvolutionRequestDTO.class))).thenReturn(evolution);
         when(evolutionRepository.countByPatientId(1L)).thenReturn(1L);
         when(evolutionRepository.save(any(Evolution.class))).thenAnswer(invocation -> {
             Evolution saved = invocation.getArgument(0);
             assertEquals(2, saved.getEvolutionNumber());
             return saved;
         });
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(evolutionDTO);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(evolutionResponseDTO);
 
-        service.create(evolutionDTO);
+        service.create(evolutionRequestDTO);
 
         verify(evolutionRepository).countByPatientId(1L);
     }
@@ -113,16 +122,16 @@ class EvolutionServiceTest {
     void shouldThrowExceptionWhenPatientNotFound() {
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> service.create(evolutionDTO));
+        assertThrows(ResourceNotFoundException.class, () -> service.create(evolutionRequestDTO));
         verify(evolutionRepository, never()).save(any(Evolution.class));
     }
 
     @Test
     void shouldFindEvolutionById() {
         when(evolutionRepository.findById(1L)).thenReturn(Optional.of(evolution));
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(evolutionDTO);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(evolutionResponseDTO);
 
-        EvolutionDTO result = service.findById(1L);
+        EvolutionResponseDTO result = service.findById(1L);
 
         assertNotNull(result);
         verify(evolutionRepository).findById(1L);
@@ -148,9 +157,9 @@ class EvolutionServiceTest {
         when(patientRepository.existsById(1L)).thenReturn(true);
         when(evolutionRepository.findByPatientIdOrderByEvolutionNumberAsc(1L))
                 .thenReturn(List.of(evolution, evolution2));
-        when(evolutionMapper.toDTOList(anyList())).thenReturn(List.of(evolutionDTO));
+        when(evolutionMapper.toResponseDTOList(anyList())).thenReturn(List.of(evolutionResponseDTO));
 
-        List<EvolutionDTO> result = service.findByPatientId(1L);
+        List<EvolutionResponseDTO> result = service.findByPatientId(1L);
 
         assertNotNull(result);
         verify(evolutionRepository).findByPatientIdOrderByEvolutionNumberAsc(1L);
@@ -166,16 +175,23 @@ class EvolutionServiceTest {
 
     @Test
     void shouldUpdateEvolutionSuccessfully() {
-        EvolutionDTO updateDTO = EvolutionDTO.builder()
+        EvolutionRequestDTO updateRequestDTO = EvolutionRequestDTO.builder()
                 .patientId(1L)
+                .conduct("Mobilização articular do ombro direito, 30 minutos + alongamento")
+                .build();
+
+        EvolutionResponseDTO updateResponseDTO = EvolutionResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .patientName("João Silva")
                 .conduct("Mobilização articular do ombro direito, 30 minutos + alongamento")
                 .build();
 
         when(evolutionRepository.findById(1L)).thenReturn(Optional.of(evolution));
         when(evolutionRepository.save(any(Evolution.class))).thenReturn(evolution);
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(updateDTO);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(updateResponseDTO);
 
-        EvolutionDTO result = service.update(1L, updateDTO);
+        EvolutionResponseDTO result = service.update(1L, updateRequestDTO);
 
         assertNotNull(result);
         verify(evolutionRepository).save(any(Evolution.class));
@@ -183,7 +199,7 @@ class EvolutionServiceTest {
 
     @Test
     void shouldThrowExceptionWhenChangingPatientOnUpdate() {
-        EvolutionDTO updateDTO = EvolutionDTO.builder()
+        EvolutionRequestDTO updateDTO = EvolutionRequestDTO.builder()
                 .patientId(2L)
                 .conduct("New conduct")
                 .build();
@@ -198,7 +214,7 @@ class EvolutionServiceTest {
     void shouldThrowExceptionWhenUpdatingNonExistentEvolution() {
         when(evolutionRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> service.update(1L, evolutionDTO));
+        assertThrows(ResourceNotFoundException.class, () -> service.update(1L, evolutionRequestDTO));
         verify(evolutionRepository, never()).save(any(Evolution.class));
     }
 
@@ -222,9 +238,9 @@ class EvolutionServiceTest {
     @Test
     void shouldFindAllEvolutions() {
         when(evolutionRepository.findAll()).thenReturn(List.of(evolution));
-        when(evolutionMapper.toDTOList(anyList())).thenReturn(List.of(evolutionDTO));
+        when(evolutionMapper.toResponseDTOList(anyList())).thenReturn(List.of(evolutionResponseDTO));
 
-        List<EvolutionDTO> result = service.findAll();
+        List<EvolutionResponseDTO> result = service.findAll();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -233,22 +249,24 @@ class EvolutionServiceTest {
 
     @Test
     void shouldUpdateEvolutionDateWhenProvided() {
-        LocalDateTime newDate = LocalDateTime.of(2025, 12, 5, 15, 0);
-        EvolutionDTO updateDTO = EvolutionDTO.builder()
+        EvolutionRequestDTO updateRequestDTO = EvolutionRequestDTO.builder()
                 .patientId(1L)
-                .evolutionDate(newDate)
+                .conduct("Updated conduct")
+                .build();
+
+        EvolutionResponseDTO updateResponseDTO = EvolutionResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .patientName("João Silva")
+                .evolutionDate(evolution.getEvolutionDate())
                 .conduct("Updated conduct")
                 .build();
 
         when(evolutionRepository.findById(1L)).thenReturn(Optional.of(evolution));
-        when(evolutionRepository.save(any(Evolution.class))).thenAnswer(invocation -> {
-            Evolution saved = invocation.getArgument(0);
-            assertEquals(newDate, saved.getEvolutionDate());
-            return saved;
-        });
-        when(evolutionMapper.toDTO(any(Evolution.class))).thenReturn(updateDTO);
+        when(evolutionRepository.save(any(Evolution.class))).thenReturn(evolution);
+        when(evolutionMapper.toResponseDTO(any(Evolution.class))).thenReturn(updateResponseDTO);
 
-        service.update(1L, updateDTO);
+        service.update(1L, updateRequestDTO);
 
         verify(evolutionRepository).save(any(Evolution.class));
     }

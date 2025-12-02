@@ -31,7 +31,8 @@ class AppointmentServiceTest {
     @InjectMocks
     private AppointmentService service;
 
-    private AppointmentDTO appointmentDTO;
+    private AppointmentRequestDTO appointmentRequestDTO;
+    private AppointmentResponseDTO appointmentResponseDTO;
     private Appointment appointment;
     private Patient patient;
 
@@ -44,9 +45,21 @@ class AppointmentServiceTest {
 
         LocalDateTime futureTime = LocalDateTime.now().plusDays(1);
 
-        appointmentDTO = AppointmentDTO.builder()
+        appointmentRequestDTO = AppointmentRequestDTO.builder()
                 .patientId(1L)
                 .startTime(futureTime)
+                .duration(AppointmentDuration.ONE_HOUR)
+                .isPaid(false)
+                .isCancelled(false)
+                .notes("Initial consultation")
+                .build();
+
+        appointmentResponseDTO = AppointmentResponseDTO.builder()
+                .id(1L)
+                .patientId(1L)
+                .patientName("João Silva")
+                .startTime(futureTime)
+                .endTime(futureTime.plusMinutes(60))
                 .duration(AppointmentDuration.ONE_HOUR)
                 .isPaid(false)
                 .isCancelled(false)
@@ -68,11 +81,11 @@ class AppointmentServiceTest {
     @Test
     void shouldCreateAppointmentSuccessfully() {
         when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
-        when(mapper.toEntity(any(AppointmentDTO.class))).thenReturn(appointment);
+        when(mapper.toEntity(any(AppointmentRequestDTO.class))).thenReturn(appointment);
         when(repository.save(any(Appointment.class))).thenReturn(appointment);
-        when(mapper.toDTO(any(Appointment.class))).thenReturn(appointmentDTO);
+        when(mapper.toResponseDTO(any(Appointment.class))).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = service.create(appointmentDTO);
+        AppointmentResponseDTO result = service.create(appointmentRequestDTO);
 
         assertNotNull(result);
         assertEquals(1L, result.getPatientId());
@@ -83,16 +96,16 @@ class AppointmentServiceTest {
     void shouldThrowExceptionWhenPatientNotFound() {
         when(patientRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(IllegalArgumentException.class, () -> service.create(appointmentDTO));
+        assertThrows(IllegalArgumentException.class, () -> service.create(appointmentRequestDTO));
         verify(repository, never()).save(any(Appointment.class));
     }
 
     @Test
     void shouldFindAppointmentById() {
         when(repository.findById(1L)).thenReturn(Optional.of(appointment));
-        when(mapper.toDTO(any(Appointment.class))).thenReturn(appointmentDTO);
+        when(mapper.toResponseDTO(any(Appointment.class))).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = service.findById(1L);
+        AppointmentResponseDTO result = service.findById(1L);
 
         assertNotNull(result);
         assertEquals(1L, result.getPatientId());
@@ -109,9 +122,9 @@ class AppointmentServiceTest {
     void shouldUpdateAppointmentSuccessfully() {
         when(repository.findById(1L)).thenReturn(Optional.of(appointment));
         when(repository.save(any(Appointment.class))).thenReturn(appointment);
-        when(mapper.toDTO(any(Appointment.class))).thenReturn(appointmentDTO);
+        when(mapper.toResponseDTO(any(Appointment.class))).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = service.update(1L, appointmentDTO);
+        AppointmentResponseDTO result = service.update(1L, appointmentRequestDTO);
 
         assertNotNull(result);
         verify(repository).save(any(Appointment.class));
@@ -121,9 +134,9 @@ class AppointmentServiceTest {
     void shouldMarkAppointmentAsPaid() {
         when(repository.findById(1L)).thenReturn(Optional.of(appointment));
         when(repository.save(any(Appointment.class))).thenReturn(appointment);
-        when(mapper.toDTO(any(Appointment.class))).thenReturn(appointmentDTO);
+        when(mapper.toResponseDTO(any(Appointment.class))).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = service.markAsPaid(1L);
+        AppointmentResponseDTO result = service.markAsPaid(1L);
 
         assertNotNull(result);
         verify(repository).save(any(Appointment.class));
@@ -133,9 +146,9 @@ class AppointmentServiceTest {
     void shouldCancelAppointment() {
         when(repository.findById(1L)).thenReturn(Optional.of(appointment));
         when(repository.save(any(Appointment.class))).thenReturn(appointment);
-        when(mapper.toDTO(any(Appointment.class))).thenReturn(appointmentDTO);
+        when(mapper.toResponseDTO(any(Appointment.class))).thenReturn(appointmentResponseDTO);
 
-        AppointmentDTO result = service.cancelAppointment(1L);
+        AppointmentResponseDTO result = service.cancelAppointment(1L);
 
         assertNotNull(result);
         verify(repository).save(any(Appointment.class));
@@ -144,9 +157,9 @@ class AppointmentServiceTest {
     @Test
     void shouldFindAppointmentsByPatientId() {
         when(repository.findByPatientId(1L)).thenReturn(List.of(appointment));
-        when(mapper.toDTOList(anyList())).thenReturn(List.of(appointmentDTO));
+        when(mapper.toResponseDTOList(anyList())).thenReturn(List.of(appointmentResponseDTO));
 
-        List<AppointmentDTO> result = service.findByPatientId(1L);
+        List<AppointmentResponseDTO> result = service.findByPatientId(1L);
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
@@ -173,9 +186,9 @@ class AppointmentServiceTest {
     @Test
     void shouldFindAllAppointments() {
         when(repository.findAll()).thenReturn(List.of(appointment));
-        when(mapper.toDTOList(anyList())).thenReturn(List.of(appointmentDTO));
+        when(mapper.toResponseDTOList(anyList())).thenReturn(List.of(appointmentResponseDTO));
 
-        List<AppointmentDTO> result = service.findAll();
+        List<AppointmentResponseDTO> result = service.findAll();
 
         assertNotNull(result);
         assertFalse(result.isEmpty());
