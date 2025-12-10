@@ -1,7 +1,6 @@
 package com.joel.consultorio_fisio.appointment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.joel.consultorio_fisio.assessment.AssessmentRepository;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -10,13 +9,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 class AppointmentControllerTest {
 
     @Autowired
@@ -31,19 +34,11 @@ class AppointmentControllerTest {
     @Autowired
     private PatientRepository patientRepository;
 
-    @Autowired
-    private AssessmentRepository assessmentRepository;
-
     private AppointmentRequestDTO appointmentRequestDTO;
     private Patient testPatient;
 
     @BeforeEach
     void setUp() {
-        // Delete in order due to foreign key constraints
-        assessmentRepository.deleteAll();
-        repository.deleteAll();
-        patientRepository.deleteAll();
-
         testPatient = Patient.builder()
                 .name("Maria Santos")
                 .phone("11987654321")

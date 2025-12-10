@@ -1,20 +1,23 @@
 package com.joel.consultorio_fisio.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.joel.consultorio_fisio.assessment.AssessmentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 class PatientControllerTest {
 
     @Autowired
@@ -26,17 +29,10 @@ class PatientControllerTest {
     @Autowired
     private PatientRepository repository;
 
-    @Autowired
-    private AssessmentRepository assessmentRepository;
-
     private PatientRequestDTO patientRequestDTO;
 
     @BeforeEach
     void setUp() {
-        // Delete assessments first due to foreign key constraint
-        assessmentRepository.deleteAll();
-        repository.deleteAll();
-
         patientRequestDTO = PatientRequestDTO.builder()
                 .name("Maria Santos")
                 .cpf("98765432100")
