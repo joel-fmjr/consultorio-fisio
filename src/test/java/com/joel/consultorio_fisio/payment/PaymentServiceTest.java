@@ -1,6 +1,5 @@
 package com.joel.consultorio_fisio.payment;
 
-import com.joel.consultorio_fisio.appointment.Appointment;
 import com.joel.consultorio_fisio.appointment.AppointmentRepository;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
