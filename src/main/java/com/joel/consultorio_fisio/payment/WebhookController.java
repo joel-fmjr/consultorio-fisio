@@ -1,5 +1,6 @@
 package com.joel.consultorio_fisio.payment;
 
+import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -13,6 +14,7 @@ import java.util.Map;
 @RequestMapping("/api/webhooks")
 @RequiredArgsConstructor
 @Slf4j
+@Hidden
 @Tag(name = "Webhooks", description = "Endpoints for receiving payment notifications from Mercado Pago")
 public class WebhookController {
 
