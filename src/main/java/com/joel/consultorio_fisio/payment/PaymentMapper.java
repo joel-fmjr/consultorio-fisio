@@ -1,5 +1,6 @@
 package com.joel.consultorio_fisio.payment;
 
+import com.joel.consultorio_fisio.payment.dtos.PIXPaymentResponseDTO;
 import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.springframework.stereotype.Component;
 
@@ -40,11 +41,11 @@ public class PaymentMapper {
                 .collect(Collectors.toList());
     }
 
-    public PIXPaymentResponse toPIXPaymentResponse(Payment entity) {
+    public PIXPaymentResponseDTO toPIXPaymentResponse(Payment entity) {
         if (entity == null) {
             return null;
         }
-        return PIXPaymentResponse.builder()
+        return PIXPaymentResponseDTO.builder()
                 .id(entity.getId())
                 .mercadoPagoPaymentId(entity.getMercadoPagoPaymentId())
                 .amount(entity.getAmount())

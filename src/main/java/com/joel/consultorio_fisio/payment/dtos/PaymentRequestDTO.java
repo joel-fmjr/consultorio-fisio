@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.payment;
+package com.joel.consultorio_fisio.payment.dtos;
 
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PIXPaymentRequest {
+public class PaymentRequestDTO {
 
     @NotNull(message = "Patient ID is required")
     private Long patientId;

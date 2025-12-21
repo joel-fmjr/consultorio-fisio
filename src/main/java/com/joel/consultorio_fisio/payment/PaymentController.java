@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.payment;
 
+import com.joel.consultorio_fisio.payment.dtos.PIXPaymentResponseDTO;
+import com.joel.consultorio_fisio.payment.dtos.PaymentRequestDTO;
 import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,8 +23,8 @@ public class PaymentController {
 
     @PostMapping("/pix")
     @Operation(summary = "Create PIX payment", description = "Creates a new PIX payment via Mercado Pago and returns QR code")
-    public ResponseEntity<PIXPaymentResponse> createPIXPayment(@Valid @RequestBody PIXPaymentRequest request) {
-        PIXPaymentResponse response = service.createPIXPayment(request);
+    public ResponseEntity<PIXPaymentResponseDTO> createPIXPayment(@Valid @RequestBody PaymentRequestDTO request) {
+        PIXPaymentResponseDTO response = service.createPIXPayment(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

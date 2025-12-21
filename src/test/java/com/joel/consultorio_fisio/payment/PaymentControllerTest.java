@@ -1,6 +1,8 @@
 package com.joel.consultorio_fisio.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.payment.dtos.PIXPaymentResponseDTO;
+import com.joel.consultorio_fisio.payment.dtos.PaymentRequestDTO;
 import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +35,7 @@ class PaymentControllerTest {
     private PaymentService paymentService;
 
     private PaymentResponseDTO paymentResponseDTO;
-    private PIXPaymentResponse pixPaymentResponse;
+    private PIXPaymentResponseDTO pixPaymentResponseDTO;
 
     @BeforeEach
     void setUp() {
@@ -47,7 +49,7 @@ class PaymentControllerTest {
                 .createdAt(LocalDateTime.now())
                 .build();
 
-        pixPaymentResponse = PIXPaymentResponse.builder()
+        pixPaymentResponseDTO = PIXPaymentResponseDTO.builder()
                 .id(1L)
                 .mercadoPagoPaymentId(12345L)
                 .amount(new BigDecimal("100.00"))
@@ -63,14 +65,14 @@ class PaymentControllerTest {
     @Test
     void testCreatePIXPayment() throws Exception {
         // Given
-        PIXPaymentRequest request = PIXPaymentRequest.builder()
+        PaymentRequestDTO request = PaymentRequestDTO.builder()
                 .patientId(1L)
                 .amount(new BigDecimal("100.00"))
                 .description("Test payment")
                 .build();
 
-        when(paymentService.createPIXPayment(any(PIXPaymentRequest.class)))
-                .thenReturn(pixPaymentResponse);
+        when(paymentService.createPIXPayment(any(PaymentRequestDTO.class)))
+                .thenReturn(pixPaymentResponseDTO);
 
         // When & Then
         mockMvc.perform(post("/api/payments/pix")

@@ -1,5 +1,6 @@
-package com.joel.consultorio_fisio.payment;
+package com.joel.consultorio_fisio.payment.dtos;
 
+import com.joel.consultorio_fisio.payment.PaymentStatus;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PIXPaymentResponse {
+public class PIXPaymentResponseDTO {
 
     private Long id;
 

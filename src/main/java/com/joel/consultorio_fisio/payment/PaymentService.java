@@ -6,6 +6,8 @@ import com.joel.consultorio_fisio.exception.PaymentProcessingException;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
+import com.joel.consultorio_fisio.payment.dtos.PIXPaymentResponseDTO;
+import com.joel.consultorio_fisio.payment.dtos.PaymentRequestDTO;
 import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.payment.PaymentCreateRequest;
@@ -60,7 +62,7 @@ public class PaymentService {
     }
 
     @Transactional
-    public PIXPaymentResponse createPIXPayment(PIXPaymentRequest request) {
+    public PIXPaymentResponseDTO createPIXPayment(PaymentRequestDTO request) {
         log.info("Creating PIX payment for patient ID: {}", request.getPatientId());
 
         try {
