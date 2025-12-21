@@ -1,5 +1,6 @@
-package com.joel.consultorio_fisio.appointment;
+package com.joel.consultorio_fisio.appointment.dtos;
 
+import com.joel.consultorio_fisio.appointment.AppointmentDuration;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,9 +12,7 @@ import java.time.LocalDateTime;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AppointmentDTO {
-
-    private Long id;
+public class AppointmentRequestDTO {
 
     @NotNull(message = "Patient ID is required")
     private Long patientId;
@@ -25,18 +24,12 @@ public class AppointmentDTO {
     @NotNull(message = "Duration is required")
     private AppointmentDuration duration;
 
-    @NotNull(message = "Payment status is required")
-    private Boolean isPaid;
+    @Builder.Default
+    private Boolean isPaid = false;
 
-    @NotNull(message = "Cancellation status is required")
-    private Boolean isCancelled;
+    @Builder.Default
+    private Boolean isCancelled = false;
 
     @Size(max = 1000, message = "Notes cannot exceed 1000 characters")
     private String notes;
-
-    // Read-only fields - calculated/populated by backend
-    private LocalDateTime endTime;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String patientName;
 }

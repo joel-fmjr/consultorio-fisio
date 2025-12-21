@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.patient;
+package com.joel.consultorio_fisio.patient.dtos;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -11,9 +11,7 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class PatientDTO {
-
-    private Long id;
+public class PatientRequestDTO {
 
     @NotBlank(message = "Name is required")
     @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
@@ -37,7 +35,4 @@ public class PatientDTO {
 
     @Size(max = 1000, message = "Medical history cannot exceed 1000 characters")
     private String medicalHistory;
-
-    private LocalDate createdAt;
-    private LocalDate updatedAt;
 }

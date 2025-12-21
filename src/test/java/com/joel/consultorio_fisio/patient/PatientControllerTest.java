@@ -1,20 +1,25 @@
 package com.joel.consultorio_fisio.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.joel.consultorio_fisio.assessment.AssessmentRepository;
+import com.joel.consultorio_fisio.patient.dtos.PatientRequestDTO;
+import com.joel.consultorio_fisio.patient.dtos.PatientResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
 @AutoConfigureMockMvc
+@ActiveProfiles("test")
+@Transactional
 class PatientControllerTest {
 
     @Autowired
@@ -23,21 +28,11 @@ class PatientControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private PatientRepository repository;
-
-    @Autowired
-    private AssessmentRepository assessmentRepository;
-
-    private PatientDTO patientDTO;
+    private PatientRequestDTO patientRequestDTO;
 
     @BeforeEach
     void setUp() {
-        // Delete assessments first due to foreign key constraint
-        assessmentRepository.deleteAll();
-        repository.deleteAll();
-
-        patientDTO = PatientDTO.builder()
+        patientRequestDTO = PatientRequestDTO.builder()
                 .name("Maria Santos")
                 .cpf("98765432100")
                 .email("maria@example.com")
@@ -51,7 +46,7 @@ class PatientControllerTest {
     void shouldCreatePatient() throws Exception {
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Maria Santos"))
                 .andExpect(jsonPath("$.cpf").value("98765432100"));
@@ -59,32 +54,32 @@ class PatientControllerTest {
 
     @Test
     void shouldReturnBadRequestWhenInvalidData() throws Exception {
-        patientDTO.setEmail("invalid-email");
+        patientRequestDTO.setEmail("invalid-email");
 
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     void shouldReturnBadRequestWhenNameIsMissing() throws Exception {
-        patientDTO.setName(null);
+        patientRequestDTO.setName(null);
 
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.name").exists());
     }
 
     @Test
     void shouldReturnBadRequestWhenPhoneIsMissing() throws Exception {
-        patientDTO.setPhone(null);
+        patientRequestDTO.setPhone(null);
 
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.errors.phone").exists());
     }
@@ -98,7 +93,7 @@ class PatientControllerTest {
 
     @Test
     void shouldCreatePatientWithMinimalData() throws Exception {
-        PatientDTO minimalDTO = PatientDTO.builder()
+        PatientRequestDTO minimalDTO = PatientRequestDTO.builder()
                 .name("Quick Patient")
                 .phone("11999999999")
                 .build();
@@ -115,11 +110,11 @@ class PatientControllerTest {
     void shouldGetPatientById() throws Exception {
         String response = mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        PatientDTO created = objectMapper.readValue(response, PatientDTO.class);
+        PatientResponseDTO created = objectMapper.readValue(response, PatientResponseDTO.class);
 
         mockMvc.perform(get("/api/patients/" + created.getId()))
                 .andExpect(status().isOk())
@@ -136,16 +131,23 @@ class PatientControllerTest {
     void shouldUpdatePatient() throws Exception {
         String response = mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        PatientDTO created = objectMapper.readValue(response, PatientDTO.class);
-        created.setName("Updated Name");
+        PatientResponseDTO created = objectMapper.readValue(response, PatientResponseDTO.class);
+        PatientRequestDTO updateDTO = PatientRequestDTO.builder()
+                .name("Updated Name")
+                .cpf(created.getCpf())
+                .email(created.getEmail())
+                .phone(created.getPhone())
+                .birthDate(created.getBirthDate())
+                .address(created.getAddress())
+                .build();
 
         mockMvc.perform(put("/api/patients/" + created.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(created)))
+                .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Updated Name"));
     }
@@ -154,11 +156,11 @@ class PatientControllerTest {
     void shouldDeletePatient() throws Exception {
         String response = mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated())
                 .andReturn().getResponse().getContentAsString();
 
-        PatientDTO created = objectMapper.readValue(response, PatientDTO.class);
+        PatientResponseDTO created = objectMapper.readValue(response, PatientResponseDTO.class);
 
         mockMvc.perform(delete("/api/patients/" + created.getId()))
                 .andExpect(status().isNoContent());
@@ -168,7 +170,7 @@ class PatientControllerTest {
     void shouldSearchPatientsByName() throws Exception {
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated());
 
         mockMvc.perform(get("/api/patients/search?name=Maria"))
@@ -180,10 +182,10 @@ class PatientControllerTest {
     void shouldReturnBadRequestWhenCpfAlreadyExists() throws Exception {
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated());
 
-        PatientDTO duplicateCpf = PatientDTO.builder()
+        PatientRequestDTO duplicateCpf = PatientRequestDTO.builder()
                 .name("Another Patient")
                 .cpf("98765432100")
                 .phone("11999999999")
@@ -200,10 +202,10 @@ class PatientControllerTest {
     void shouldReturnBadRequestWhenEmailAlreadyExists() throws Exception {
         mockMvc.perform(post("/api/patients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(patientDTO)))
+                .content(objectMapper.writeValueAsString(patientRequestDTO)))
                 .andExpect(status().isCreated());
 
-        PatientDTO duplicateEmail = PatientDTO.builder()
+        PatientRequestDTO duplicateEmail = PatientRequestDTO.builder()
                 .name("Another Patient")
                 .email("maria@example.com")
                 .phone("11999999999")

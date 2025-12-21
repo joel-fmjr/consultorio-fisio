@@ -1,6 +1,7 @@
 package com.joel.consultorio_fisio.payment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,12 +32,12 @@ class PaymentControllerTest {
     @MockitoBean
     private PaymentService paymentService;
 
-    private PaymentDTO paymentDTO;
+    private PaymentResponseDTO paymentResponseDTO;
     private PIXPaymentResponse pixPaymentResponse;
 
     @BeforeEach
     void setUp() {
-        paymentDTO = PaymentDTO.builder()
+        paymentResponseDTO = PaymentResponseDTO.builder()
                 .id(1L)
                 .mercadoPagoPaymentId(12345L)
                 .patientId(1L)
@@ -84,7 +85,7 @@ class PaymentControllerTest {
     @Test
     void testFindById() throws Exception {
         // Given
-        when(paymentService.findById(1L)).thenReturn(paymentDTO);
+        when(paymentService.findById(1L)).thenReturn(paymentResponseDTO);
 
         // When & Then
         mockMvc.perform(get("/api/payments/1"))
@@ -96,7 +97,7 @@ class PaymentControllerTest {
     @Test
     void testFindByMercadoPagoId() throws Exception {
         // Given
-        when(paymentService.findByMercadoPagoId(12345L)).thenReturn(paymentDTO);
+        when(paymentService.findByMercadoPagoId(12345L)).thenReturn(paymentResponseDTO);
 
         // When & Then
         mockMvc.perform(get("/api/payments/mercadopago/12345"))
@@ -107,7 +108,7 @@ class PaymentControllerTest {
     @Test
     void testFindByPatientId() throws Exception {
         // Given
-        List<PaymentDTO> payments = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> payments = Arrays.asList(paymentResponseDTO);
         when(paymentService.findByPatientId(1L)).thenReturn(payments);
 
         // When & Then
@@ -119,7 +120,7 @@ class PaymentControllerTest {
     @Test
     void testFindAll() throws Exception {
         // Given
-        List<PaymentDTO> payments = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> payments = Arrays.asList(paymentResponseDTO);
         when(paymentService.findAll()).thenReturn(payments);
 
         // When & Then
@@ -131,7 +132,7 @@ class PaymentControllerTest {
     @Test
     void testFindAllByStatus() throws Exception {
         // Given
-        List<PaymentDTO> payments = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> payments = Arrays.asList(paymentResponseDTO);
         when(paymentService.findByStatus(PaymentStatus.PENDING)).thenReturn(payments);
 
         // When & Then

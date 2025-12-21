@@ -4,6 +4,7 @@ import com.joel.consultorio_fisio.appointment.AppointmentRepository;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ class PaymentServiceTest {
     private PaymentService paymentService;
 
     private Payment payment;
-    private PaymentDTO paymentDTO;
+    private PaymentResponseDTO paymentResponseDTO;
     private Patient patient;
 
     @BeforeEach
@@ -60,7 +61,7 @@ class PaymentServiceTest {
                 .paymentMethod("pix")
                 .build();
 
-        paymentDTO = PaymentDTO.builder()
+        paymentResponseDTO = PaymentResponseDTO.builder()
                 .id(1L)
                 .mercadoPagoPaymentId(12345L)
                 .patientId(1L)
@@ -74,12 +75,12 @@ class PaymentServiceTest {
     void testFindAll() {
         // Given
         List<Payment> payments = Arrays.asList(payment);
-        List<PaymentDTO> paymentDTOs = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> paymentDTOs = Arrays.asList(paymentResponseDTO);
         when(paymentRepository.findAll()).thenReturn(payments);
-        when(paymentMapper.toDTOList(payments)).thenReturn(paymentDTOs);
+        when(paymentMapper.toResponseDTOList(payments)).thenReturn(paymentDTOs);
 
         // When
-        List<PaymentDTO> result = paymentService.findAll();
+        List<PaymentResponseDTO> result = paymentService.findAll();
 
         // Then
         assertNotNull(result);
@@ -91,10 +92,10 @@ class PaymentServiceTest {
     void testFindById_Success() {
         // Given
         when(paymentRepository.findById(1L)).thenReturn(Optional.of(payment));
-        when(paymentMapper.toDTO(payment)).thenReturn(paymentDTO);
+        when(paymentMapper.toResponseDTO(payment)).thenReturn(paymentResponseDTO);
 
         // When
-        PaymentDTO result = paymentService.findById(1L);
+        PaymentResponseDTO result = paymentService.findById(1L);
 
         // Then
         assertNotNull(result);
@@ -117,10 +118,10 @@ class PaymentServiceTest {
     void testFindByMercadoPagoId_Success() {
         // Given
         when(paymentRepository.findByMercadoPagoPaymentId(12345L)).thenReturn(Optional.of(payment));
-        when(paymentMapper.toDTO(payment)).thenReturn(paymentDTO);
+        when(paymentMapper.toResponseDTO(payment)).thenReturn(paymentResponseDTO);
 
         // When
-        PaymentDTO result = paymentService.findByMercadoPagoId(12345L);
+        PaymentResponseDTO result = paymentService.findByMercadoPagoId(12345L);
 
         // Then
         assertNotNull(result);
@@ -132,12 +133,12 @@ class PaymentServiceTest {
     void testFindByPatientId() {
         // Given
         List<Payment> payments = Arrays.asList(payment);
-        List<PaymentDTO> paymentDTOs = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> paymentDTOs = Arrays.asList(paymentResponseDTO);
         when(paymentRepository.findByPatientId(1L)).thenReturn(payments);
-        when(paymentMapper.toDTOList(payments)).thenReturn(paymentDTOs);
+        when(paymentMapper.toResponseDTOList(payments)).thenReturn(paymentDTOs);
 
         // When
-        List<PaymentDTO> result = paymentService.findByPatientId(1L);
+        List<PaymentResponseDTO> result = paymentService.findByPatientId(1L);
 
         // Then
         assertNotNull(result);
@@ -149,12 +150,12 @@ class PaymentServiceTest {
     void testFindByStatus() {
         // Given
         List<Payment> payments = Arrays.asList(payment);
-        List<PaymentDTO> paymentDTOs = Arrays.asList(paymentDTO);
+        List<PaymentResponseDTO> paymentDTOs = Arrays.asList(paymentResponseDTO);
         when(paymentRepository.findByStatus(PaymentStatus.PENDING)).thenReturn(payments);
-        when(paymentMapper.toDTOList(payments)).thenReturn(paymentDTOs);
+        when(paymentMapper.toResponseDTOList(payments)).thenReturn(paymentDTOs);
 
         // When
-        List<PaymentDTO> result = paymentService.findByStatus(PaymentStatus.PENDING);
+        List<PaymentResponseDTO> result = paymentService.findByStatus(PaymentStatus.PENDING);
 
         // Then
         assertNotNull(result);
@@ -167,10 +168,10 @@ class PaymentServiceTest {
         // Given
         when(paymentRepository.findByMercadoPagoPaymentId(12345L)).thenReturn(Optional.of(payment));
         when(paymentRepository.save(any(Payment.class))).thenReturn(payment);
-        when(paymentMapper.toDTO(payment)).thenReturn(paymentDTO);
+        when(paymentMapper.toResponseDTO(payment)).thenReturn(paymentResponseDTO);
 
         // When
-        PaymentDTO result = paymentService.updatePaymentStatus(12345L, PaymentStatus.APPROVED, "approved");
+        PaymentResponseDTO result = paymentService.updatePaymentStatus(12345L, PaymentStatus.APPROVED, "approved");
 
         // Then
         assertNotNull(result);

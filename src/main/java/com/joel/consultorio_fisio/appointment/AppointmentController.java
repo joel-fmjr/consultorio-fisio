@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.appointment;
 
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentRequestDTO;
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,34 +22,34 @@ public class AppointmentController {
 
     @GetMapping
     @Operation(summary = "List all appointments", description = "Returns a list of all appointments")
-    public ResponseEntity<List<AppointmentDTO>> findAll() {
+    public ResponseEntity<List<AppointmentResponseDTO>> findAll() {
         return ResponseEntity.ok(service.findAll());
     }
 
     @GetMapping("/{id}")
     @Operation(summary = "Find appointment by ID", description = "Returns a single appointment by its ID")
-    public ResponseEntity<AppointmentDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<AppointmentResponseDTO> findById(@PathVariable Long id) {
         return ResponseEntity.ok(service.findById(id));
     }
 
     @GetMapping("/patient/{patientId}")
     @Operation(summary = "Find appointments by patient ID", description = "Returns all appointments for a specific patient")
-    public ResponseEntity<List<AppointmentDTO>> findByPatientId(@PathVariable Long patientId) {
+    public ResponseEntity<List<AppointmentResponseDTO>> findByPatientId(@PathVariable Long patientId) {
         return ResponseEntity.ok(service.findByPatientId(patientId));
     }
 
     @PostMapping
     @Operation(summary = "Create a new appointment", description = "Creates a new appointment record")
-    public ResponseEntity<AppointmentDTO> create(@Valid @RequestBody AppointmentDTO dto) {
-        AppointmentDTO created = service.create(dto);
+    public ResponseEntity<AppointmentResponseDTO> create(@Valid @RequestBody AppointmentRequestDTO dto) {
+        AppointmentResponseDTO created = service.create(dto);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Update an appointment", description = "Updates an existing appointment record")
-    public ResponseEntity<AppointmentDTO> update(
+    public ResponseEntity<AppointmentResponseDTO> update(
             @PathVariable Long id,
-            @Valid @RequestBody AppointmentDTO dto) {
+            @Valid @RequestBody AppointmentRequestDTO dto) {
         return ResponseEntity.ok(service.update(id, dto));
     }
 
@@ -60,13 +62,13 @@ public class AppointmentController {
 
     @PatchMapping("/{id}/pay")
     @Operation(summary = "Mark appointment as paid", description = "Updates the payment status of an appointment to paid")
-    public ResponseEntity<AppointmentDTO> markAsPaid(@PathVariable Long id) {
+    public ResponseEntity<AppointmentResponseDTO> markAsPaid(@PathVariable Long id) {
         return ResponseEntity.ok(service.markAsPaid(id));
     }
 
     @PatchMapping("/{id}/cancel")
     @Operation(summary = "Cancel appointment", description = "Cancels an appointment by setting its status to cancelled")
-    public ResponseEntity<AppointmentDTO> cancelAppointment(@PathVariable Long id) {
+    public ResponseEntity<AppointmentResponseDTO> cancelAppointment(@PathVariable Long id) {
         return ResponseEntity.ok(service.cancelAppointment(id));
     }
 }

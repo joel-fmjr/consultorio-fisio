@@ -1,5 +1,6 @@
 package com.joel.consultorio_fisio.payment;
 
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -8,11 +9,11 @@ import java.util.stream.Collectors;
 @Component
 public class PaymentMapper {
 
-    public PaymentDTO toDTO(Payment entity) {
+    public PaymentResponseDTO toResponseDTO(Payment entity) {
         if (entity == null) {
             return null;
         }
-        return PaymentDTO.builder()
+        return PaymentResponseDTO.builder()
                 .id(entity.getId())
                 .mercadoPagoPaymentId(entity.getMercadoPagoPaymentId())
                 .patientId(entity.getPatient() != null ? entity.getPatient().getId() : null)
@@ -33,30 +34,9 @@ public class PaymentMapper {
                 .build();
     }
 
-    public Payment toEntity(PaymentDTO dto) {
-        if (dto == null) {
-            return null;
-        }
-        return Payment.builder()
-                .id(dto.getId())
-                .mercadoPagoPaymentId(dto.getMercadoPagoPaymentId())
-                .amount(dto.getAmount())
-                .status(dto.getStatus())
-                .paymentMethod(dto.getPaymentMethod())
-                .qrCode(dto.getQrCode())
-                .qrCodeBase64(dto.getQrCodeBase64())
-                .ticketUrl(dto.getTicketUrl())
-                .externalReference(dto.getExternalReference())
-                .statusDetail(dto.getStatusDetail())
-                .description(dto.getDescription())
-                .payerEmail(dto.getPayerEmail())
-                .dateOfExpiration(dto.getDateOfExpiration())
-                .build();
-    }
-
-    public List<PaymentDTO> toDTOList(List<Payment> entities) {
+    public List<PaymentResponseDTO> toResponseDTOList(List<Payment> entities) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 

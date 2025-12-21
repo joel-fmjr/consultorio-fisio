@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.assessment;
 
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentRequestDTO;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import org.springframework.stereotype.Component;
 
@@ -9,11 +11,11 @@ import java.util.stream.Collectors;
 @Component
 public class AssessmentMapper {
 
-    public AssessmentDTO toDTO(Assessment entity) {
+    public AssessmentResponseDTO toResponseDTO(Assessment entity) {
         if (entity == null) {
             return null;
         }
-        return AssessmentDTO.builder()
+        return AssessmentResponseDTO.builder()
                 .id(entity.getId())
                 .patientId(entity.getPatient().getId())
                 .patientName(entity.getPatient().getName())
@@ -91,7 +93,7 @@ public class AssessmentMapper {
                 .build();
     }
 
-    public Assessment toEntity(AssessmentDTO dto) {
+    public Assessment toEntity(AssessmentRequestDTO dto) {
         if (dto == null) {
             return null;
         }
@@ -101,7 +103,6 @@ public class AssessmentMapper {
                 .build();
 
         return Assessment.builder()
-                .id(dto.getId())
                 .patient(patient)
                 .assessmentDate(dto.getAssessmentDate())
                 // Diagnosis
@@ -174,9 +175,9 @@ public class AssessmentMapper {
                 .build();
     }
 
-    public List<AssessmentDTO> toDTOList(List<Assessment> entities) {
+    public List<AssessmentResponseDTO> toResponseDTOList(List<Assessment> entities) {
         return entities.stream()
-                .map(this::toDTO)
+                .map(this::toResponseDTO)
                 .collect(Collectors.toList());
     }
 }

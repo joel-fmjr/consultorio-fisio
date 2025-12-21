@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.evolution;
 
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionRequestDTO;
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionResponseDTO;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
@@ -17,27 +19,27 @@ public class EvolutionService {
     private final EvolutionMapper evolutionMapper;
     private final PatientRepository patientRepository;
 
-    public List<EvolutionDTO> findAll() {
-        return evolutionMapper.toDTOList(evolutionRepository.findAll());
+    public List<EvolutionResponseDTO> findAll() {
+        return evolutionMapper.toResponseDTOList(evolutionRepository.findAll());
     }
 
-    public EvolutionDTO findById(Long id) {
+    public EvolutionResponseDTO findById(Long id) {
         Evolution evolution = evolutionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Evolution not found with id: " + id));
-        return evolutionMapper.toDTO(evolution);
+        return evolutionMapper.toResponseDTO(evolution);
     }
 
-    public List<EvolutionDTO> findByPatientId(Long patientId) {
+    public List<EvolutionResponseDTO> findByPatientId(Long patientId) {
         if (!patientRepository.existsById(patientId)) {
             throw new ResourceNotFoundException("Patient not found with id: " + patientId);
         }
 
         List<Evolution> evolutions = evolutionRepository.findByPatientIdOrderByEvolutionNumberAsc(patientId);
-        return evolutionMapper.toDTOList(evolutions);
+        return evolutionMapper.toResponseDTOList(evolutions);
     }
 
     @Transactional
-    public EvolutionDTO create(EvolutionDTO dto) {
+    public EvolutionResponseDTO create(EvolutionRequestDTO dto) {
         Patient patient = patientRepository.findById(dto.getPatientId())
                 .orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + dto.getPatientId()));
 
@@ -48,11 +50,11 @@ public class EvolutionService {
         evolution.setEvolutionNumber((int) count + 1);
 
         Evolution saved = evolutionRepository.save(evolution);
-        return evolutionMapper.toDTO(saved);
+        return evolutionMapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public EvolutionDTO update(Long id, EvolutionDTO dto) {
+    public EvolutionResponseDTO update(Long id, EvolutionRequestDTO dto) {
         Evolution existingEvolution = evolutionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Evolution not found with id: " + id));
 
@@ -61,12 +63,9 @@ public class EvolutionService {
         }
 
         existingEvolution.setConduct(dto.getConduct());
-        if (dto.getEvolutionDate() != null) {
-            existingEvolution.setEvolutionDate(dto.getEvolutionDate());
-        }
 
         Evolution updated = evolutionRepository.save(existingEvolution);
-        return evolutionMapper.toDTO(updated);
+        return evolutionMapper.toResponseDTO(updated);
     }
 
     @Transactional

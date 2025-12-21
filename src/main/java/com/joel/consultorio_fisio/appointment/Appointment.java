@@ -55,8 +55,6 @@ public class Appointment {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (isPaid == null) isPaid = false;
-        if (isCancelled == null) isCancelled = false;
         calculateEndTime();
     }
 

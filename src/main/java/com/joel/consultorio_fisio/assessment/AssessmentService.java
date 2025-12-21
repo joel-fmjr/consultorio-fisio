@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.assessment;
 
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentRequestDTO;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentResponseDTO;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
@@ -17,22 +19,22 @@ public class AssessmentService {
     private final AssessmentMapper mapper;
     private final PatientRepository patientRepository;
 
-    public List<AssessmentDTO> findAll() {
-        return mapper.toDTOList(repository.findAll());
+    public List<AssessmentResponseDTO> findAll() {
+        return mapper.toResponseDTOList(repository.findAll());
     }
 
-    public AssessmentDTO findById(Long id) {
+    public AssessmentResponseDTO findById(Long id) {
         Assessment assessment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment not found with id: " + id));
-        return mapper.toDTO(assessment);
+        return mapper.toResponseDTO(assessment);
     }
 
-    public List<AssessmentDTO> findByPatientId(Long patientId) {
-        return mapper.toDTOList(repository.findByPatientIdOrderByAssessmentDateDesc(patientId));
+    public List<AssessmentResponseDTO> findByPatientId(Long patientId) {
+        return mapper.toResponseDTOList(repository.findByPatientIdOrderByAssessmentDateDesc(patientId));
     }
 
     @Transactional
-    public AssessmentDTO create(AssessmentDTO dto) {
+    public AssessmentResponseDTO create(AssessmentRequestDTO dto) {
         // Validate patient exists
         Patient patient = patientRepository.findById(dto.getPatientId())
                 .orElseThrow(() -> new IllegalArgumentException("Patient not found with id: " + dto.getPatientId()));
@@ -41,11 +43,11 @@ public class AssessmentService {
         assessment.setPatient(patient);
 
         Assessment saved = repository.save(assessment);
-        return mapper.toDTO(saved);
+        return mapper.toResponseDTO(saved);
     }
 
     @Transactional
-    public AssessmentDTO update(Long id, AssessmentDTO dto) {
+    public AssessmentResponseDTO update(Long id, AssessmentRequestDTO dto) {
         Assessment existingAssessment = repository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Assessment not found with id: " + id));
 
@@ -185,7 +187,7 @@ public class AssessmentService {
         existingAssessment.setOtherObservations(dto.getOtherObservations());
 
         Assessment updated = repository.save(existingAssessment);
-        return mapper.toDTO(updated);
+        return mapper.toResponseDTO(updated);
     }
 
     @Transactional
