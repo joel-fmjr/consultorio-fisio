@@ -1,6 +1,8 @@
 package com.joel.consultorio_fisio.patient;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.patient.dtos.PatientRequestDTO;
+import com.joel.consultorio_fisio.patient.dtos.PatientResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

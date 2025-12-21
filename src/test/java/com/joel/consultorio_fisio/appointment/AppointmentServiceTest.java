@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.appointment;
 
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentRequestDTO;
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentResponseDTO;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;

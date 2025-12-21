@@ -1,6 +1,8 @@
 package com.joel.consultorio_fisio.assessment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentRequestDTO;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;

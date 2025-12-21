@@ -1,6 +1,8 @@
 package com.joel.consultorio_fisio.appointment;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentRequestDTO;
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,9 +29,6 @@ class AppointmentControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private AppointmentRepository repository;
 
     @Autowired
     private PatientRepository patientRepository;

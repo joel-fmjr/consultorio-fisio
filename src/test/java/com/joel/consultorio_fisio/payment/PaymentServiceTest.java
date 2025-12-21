@@ -4,6 +4,7 @@ import com.joel.consultorio_fisio.appointment.AppointmentRepository;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
