@@ -33,9 +33,6 @@ class AssessmentControllerTest {
     private ObjectMapper objectMapper;
 
     @Autowired
-    private AssessmentRepository repository;
-
-    @Autowired
     private PatientRepository patientRepository;
 
     private AssessmentRequestDTO assessmentRequestDTO;

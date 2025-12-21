@@ -28,9 +28,6 @@ class PatientControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @Autowired
-    private PatientRepository repository;
-
     private PatientRequestDTO patientRequestDTO;
 
     @BeforeEach
