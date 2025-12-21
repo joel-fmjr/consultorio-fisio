@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.evolution;
+package com.joel.consultorio_fisio.evolution.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

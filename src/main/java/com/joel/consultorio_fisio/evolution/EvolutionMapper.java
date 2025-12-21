@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.evolution;
 
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionRequestDTO;
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import org.springframework.stereotype.Component;
 

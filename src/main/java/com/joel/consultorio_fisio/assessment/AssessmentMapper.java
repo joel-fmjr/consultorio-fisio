@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.assessment;
 
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentRequestDTO;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import org.springframework.stereotype.Component;
 

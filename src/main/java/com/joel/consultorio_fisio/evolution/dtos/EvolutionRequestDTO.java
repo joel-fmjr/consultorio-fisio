@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.evolution;
+package com.joel.consultorio_fisio.evolution.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

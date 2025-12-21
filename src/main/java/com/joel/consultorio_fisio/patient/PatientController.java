@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.patient;
 
+import com.joel.consultorio_fisio.patient.dtos.PatientRequestDTO;
+import com.joel.consultorio_fisio.patient.dtos.PatientResponseDTO;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

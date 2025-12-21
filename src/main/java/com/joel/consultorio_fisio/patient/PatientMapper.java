@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.patient;
 
+import com.joel.consultorio_fisio.patient.dtos.PatientRequestDTO;
+import com.joel.consultorio_fisio.patient.dtos.PatientResponseDTO;
 import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.stream.Collectors;

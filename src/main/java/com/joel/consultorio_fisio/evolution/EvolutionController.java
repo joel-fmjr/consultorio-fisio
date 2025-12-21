@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.evolution;
 
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionRequestDTO;
+import com.joel.consultorio_fisio.evolution.dtos.EvolutionResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

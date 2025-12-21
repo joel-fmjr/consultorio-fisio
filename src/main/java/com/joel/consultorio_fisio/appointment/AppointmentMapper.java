@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.appointment;
 
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentRequestDTO;
+import com.joel.consultorio_fisio.appointment.dtos.AppointmentResponseDTO;
 import com.joel.consultorio_fisio.patient.Patient;
 import org.springframework.stereotype.Component;
 import java.util.List;

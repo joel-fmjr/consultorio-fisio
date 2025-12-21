@@ -1,5 +1,7 @@
 package com.joel.consultorio_fisio.assessment;
 
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentRequestDTO;
+import com.joel.consultorio_fisio.assessment.dtos.AssessmentResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

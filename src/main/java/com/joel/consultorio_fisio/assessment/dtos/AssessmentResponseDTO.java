@@ -1,5 +1,6 @@
-package com.joel.consultorio_fisio.assessment;
+package com.joel.consultorio_fisio.assessment.dtos;
 
+import com.joel.consultorio_fisio.assessment.EatingHabits;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

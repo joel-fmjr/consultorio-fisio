@@ -1,5 +1,6 @@
 package com.joel.consultorio_fisio.payment;
 
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

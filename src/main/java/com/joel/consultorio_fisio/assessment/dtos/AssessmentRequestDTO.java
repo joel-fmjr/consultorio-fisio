@@ -1,5 +1,6 @@
-package com.joel.consultorio_fisio.assessment;
+package com.joel.consultorio_fisio.assessment.dtos;
 
+import com.joel.consultorio_fisio.assessment.EatingHabits;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -7,15 +8,12 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AssessmentDTO {
-
-    private Long id;
+public class AssessmentRequestDTO {
 
     @NotNull(message = "Patient ID is required")
     private Long patientId;
@@ -156,9 +154,4 @@ public class AssessmentDTO {
     // Other Observations
     @Size(max = 5000, message = "Other observations cannot exceed 5000 characters")
     private String otherObservations;
-
-    // Read-only fields
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private String patientName;
 }

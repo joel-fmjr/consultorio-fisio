@@ -1,6 +1,8 @@
 package com.joel.consultorio_fisio.patient;
 
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
+import com.joel.consultorio_fisio.patient.dtos.PatientRequestDTO;
+import com.joel.consultorio_fisio.patient.dtos.PatientResponseDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

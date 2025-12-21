@@ -1,5 +1,6 @@
 package com.joel.consultorio_fisio.payment;
 
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.patient;
+package com.joel.consultorio_fisio.patient.dtos;
 
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;

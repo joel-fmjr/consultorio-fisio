@@ -6,6 +6,7 @@ import com.joel.consultorio_fisio.exception.PaymentProcessingException;
 import com.joel.consultorio_fisio.exception.ResourceNotFoundException;
 import com.joel.consultorio_fisio.patient.Patient;
 import com.joel.consultorio_fisio.patient.PatientRepository;
+import com.joel.consultorio_fisio.payment.dtos.PaymentResponseDTO;
 import com.mercadopago.client.payment.PaymentClient;
 import com.mercadopago.client.payment.PaymentCreateRequest;
 import com.mercadopago.client.payment.PaymentPayerRequest;

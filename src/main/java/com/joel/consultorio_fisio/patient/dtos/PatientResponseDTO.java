@@ -1,4 +1,4 @@
-package com.joel.consultorio_fisio.patient;
+package com.joel.consultorio_fisio.patient.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

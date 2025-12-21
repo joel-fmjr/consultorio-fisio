@@ -1,5 +1,6 @@
-package com.joel.consultorio_fisio.appointment;
+package com.joel.consultorio_fisio.appointment.dtos;
 
+import com.joel.consultorio_fisio.appointment.AppointmentDuration;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
